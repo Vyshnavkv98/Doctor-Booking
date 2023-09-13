@@ -5,10 +5,13 @@ import Table from '../components/admin/table/Table'
 
 function AdminHome() {
   return (
-    <div className='bg-gray-800 '>
-     <Sidebar/>
-     
-   
+    <div className='bg-gray-800  '>
+      <div className='p-5 '>
+        <Sidebar />
+      </div>
+
+
+
     </div>
   )
 }

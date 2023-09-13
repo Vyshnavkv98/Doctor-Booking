@@ -24,6 +24,7 @@ const handleSubmit=async(e)=>{
   console.log(formData);
   try {
    const res= await axios.post("admin/login",formData)
+   console.log(res);
    if(res.data.message==='login success'){
     toast.success("Login successfull",{
       position:toast.POSITION,
@@ -39,7 +40,7 @@ const handleSubmit=async(e)=>{
 
 
   return (
-    <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
+    <section className="h-screen flex flex-col md:flex-col justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0 bg-black">
     <div className="md:w-1/3 max-w-sm">
      
       <img

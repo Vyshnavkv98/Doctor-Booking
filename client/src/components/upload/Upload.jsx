@@ -30,7 +30,7 @@ console.log(formData);
   return (  
     <div>
         <form onSubmit={handleSubmit}>
-     <input type='file' onChange={handleFileChange} name='image' />
+     <input type='file' onChange={handleFileChange} name='image' multiple />
      <button >Upload</button>
      </form>
     </div>

@@ -4,7 +4,7 @@ import AdminLogin from '../components/adminLogin/AdminLogin'
 
 function AdminLoginPage() {
   return (
-    <div className='bg-white'>
+    <div className='bg-black'>
      <AdminLogin />
     </div>
   )

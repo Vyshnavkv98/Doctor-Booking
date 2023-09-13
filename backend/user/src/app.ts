@@ -1,4 +1,5 @@
 import express from 'express';
+
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -9,10 +10,13 @@ import MessageResponse from './interfaces/MessageResponse';
 import connectDb from "./db/mongoose"
 import userRouter from "./express-router/user"
 import adminRouter from './express-router/admin'
+import doctorRouter from './express-router/doctor'
 import fileRouter from './express-router/file'
 import cookieParser from 'cookie-parser';
 import nocache from 'nocache';
 import busboy from 'connect-busboy';
+import stripe from 'stripe';
+
 
 
 const app = express();
@@ -32,8 +36,10 @@ app.use(busboy({
     highWaterMark: 2 * 1024 * 1024,
     
 }));
+
 app.use(nocache())
-app.use(userRouter,adminRouter,fileRouter)
+app.use(userRouter,adminRouter,fileRouter,doctorRouter)
+
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);

@@ -36,14 +36,17 @@ const authLogout=async(req:RequestType,res:Response,next:NextFunction)=>{
         const authHeader = req.headers.authorization;
         if (authHeader && authHeader.startsWith('Bearer ')) {
           const accessToken = authHeader.slice(7);
-        
-         
                     
         if(!accessToken) throw new Error("Access token not found")
 
+
         const decoded=jwt.verify(accessToken,env.passwordAccess!)as jwtType
+        console.log(decoded);
+        
 
         const user=decoded.user
+        console.log(user);
+        
         if (!user) throw new Error("No User");
         req.user=user
 

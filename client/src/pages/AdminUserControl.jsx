@@ -18,9 +18,9 @@ function AdminUserControl() {
           setAllUsers([...response.data]);
           setUsers([...response.data]);
         }
-      } catch (error) { }
+      } catch (error){}
     })();
-  }, []);
+  },[]);  
 
   const getData = (data) => {
     setSearchWord(data);
@@ -28,7 +28,6 @@ function AdminUserControl() {
 
   useEffect(() => {
     if (searchWord) {
-      console.log(searchWord);
       const filteredUsers = allUsers.filter((val) => {
         if (searchWord === '' || /^\s*$/.test(searchWord)) {
           return true;

@@ -3,18 +3,25 @@ import React from 'react'
 import SideNavBar from '../sidenavbar/SideNavBar'
 import AddFileButton from '../addFile/AddFileButton'
 import AddFolder from '../addFile/AddFolder'
+import TopNavBar from '../topNavBar/TopNavBar'
+import UserHome from '../user/UserHome'
 
 function home() {
 
   return (
-    <div className='bg-white flex position'>
-    <SideNavBar />
-<div className=' bg-green-400 w-0 '>
-<AddFileButton/> 
-<AddFolder /> 
-</div>
-  
+    <div class="bg-white flex flex-wrap">
+    <div >
+      <SideNavBar />
     </div>
+    <div class="flex-1">
+      <TopNavBar className="flex-1 fixed" />
+      <UserHome />
+    </div>
+    <div>
+     
+    </div>
+  </div>
+  
   )
 }
 

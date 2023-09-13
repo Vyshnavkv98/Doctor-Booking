@@ -1,4 +1,5 @@
 import User, { userInterface } from "../../models/user"
+import {Request, Response} from 'express'
 import bcrypt from "bcrypt"
 import env from "../../environment/env";
 import jwt from "jsonwebtoken"
@@ -6,7 +7,15 @@ import NotFoundError from "../../utils/notFoundError";
 import sendMailVerification from "../../utils/sendMailVerification";
 import InternalServerError from "../../utils/InternalServerError"
 import NodeCache = require("node-cache");
+import { IAppointmentDataType, userEditType } from "../../models/interface";
 import { type } from "os";
+import UserRepository from "../../repositories/userRepository";
+import { Appointment } from "../../models/appointments";
+import mongoose, { Number } from "mongoose";
+import paymentService from '../../utils/paymentService'
+import { IPaymentInterface } from "../../interfaces/doctorSlot";
+
+const userRepository=new UserRepository()
 
 const userCache = new NodeCache()
 const otpCache = new NodeCache()
@@ -27,6 +36,18 @@ type jwtType = {
     iv: Buffer,
     _id: string
 };
+type userAccessType = {
+    _id: string,
+    emailVerified: boolean,
+    email: string,
+    admin: boolean,
+    botChecked: boolean,
+    username: string,
+}
+interface RequestType extends Request {
+    user?: userAccessType,
+    encryptedToken?: string
+}
 const uknownUserType = User as unknown;
 const UserStaticType = uknownUserType as {
     findByCreds: (email: string, password: string) => Promise<userInterface>;
@@ -56,6 +77,11 @@ class userServices {
         const userData:any=userCache.get(email)
         const genOtp =otpCache.get(email)
         console.log(genOtp,otp);
+        const isRegistered=await userRepository.isExist(email)
+
+        if(isRegistered){
+            throw new Error('Email already exist')
+        }
         
         if(otp===genOtp){
             const user = new User({
@@ -70,6 +96,7 @@ class userServices {
     
             await user.save()
             if (!user) throw new NotFoundError("User not Found")
+            else return user
         }else{
             return false
         }
@@ -136,6 +163,24 @@ class userServices {
         if (!user) throw new NotFoundError("Could Not Find User");
         user.tokens = [];
         await user.save();
+    }
+    updateEditedUserData=async(userData:userEditType)=>{
+       const response= await userRepository.updateEditedUserProfile(userData)
+    }
+
+    doctorList=async()=>{
+       const doctors=await userRepository.getDoctors()
+       return doctors
+    }
+
+    offlineAppointmentConfirm=async(appointmentData:IAppointmentDataType)=>{
+        const addedAppointmentData=await userRepository.addOfflineAppointmentData(appointmentData)
+            return addedAppointmentData
+    }
+
+    confirmPayment=async(req:Request,res:Response,doctorData:IPaymentInterface)=>{
+     const response=await paymentService(req,res,doctorData)
+     return response
     }
 
 }

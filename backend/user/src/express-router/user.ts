@@ -16,6 +16,11 @@ router.post("/verfyotp", userController.verifyOtp);
 router.post("/get-token", userController.getToken);
 router.post("/logout",authLogout,userController.logout)
 router.post("/logoutAll",authLogout,userController.logoutAll)
+router.post("/edit-user",userController.editUserProfile)
+router.post("/getall-doctors",userController.getDocorList)
+router.post("/add-appointment",userController.confirmOfflineAppointment)
+router.post("/create-checkout-session",userController.paymentConfirm)
+
 
 
 

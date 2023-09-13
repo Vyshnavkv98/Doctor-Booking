@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import bgImg from "../../assets/img1.jpg"
+import bgImg2 from '../../assets/doctor.jpg'
 import { useForm } from 'react-hook-form';
-import { TextField } from '@mui/material';
+import { FormLabel, Grid, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import "./Registration.css"
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -11,16 +12,18 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { BsFillShieldLockFill } from "react-icons/bs";
 import { CgSpinner } from "react-icons/cg";
 import OtpInput from "otp-input-react"
-import {auth} from "../../firebase";
-import {toast} from "react-toastify"
-import { signInWithPhoneNumber,RecaptchaVerifier } from 'firebase/auth';
+import { auth } from "../../firebase";
+import { toast } from "react-toastify"
+import { signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
-import {firestore } from '../../firebase';
+import { firestore } from '../../firebase';
 import axios from '../../axios/axios';
 import { useNavigate } from 'react-router-dom';
-import {useFormik} from "formik"
+import { useFormik } from "formik"
 import { signUpSchema } from '../../helper/SignupSchema';
+import { boolean } from 'yup';
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 
@@ -32,250 +35,238 @@ import { signUpSchema } from '../../helper/SignupSchema';
 
 export default function Register() {
 
+  const [otp, setOtp] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [showOtp, setshowOtp] = useState(false)
+  const [user, setUser] = useState(true)
+  const [countDown, setCountDown] = useState(true)
+  const [countDownTime, setCountDownTime] = useState(15)
 
-const navigate=useNavigate()
-
+  const navigate = useNavigate()
+const handleLogin=()=>{
+  navigate('/login')
+}
   // const { register, handleSubmit, watch, formState: { errors } } = useForm()
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
     email: "",
     dob: "",
-    phonenumber:"",
+    phonenumber: "",
     password: "",
-    cpassword:""
+    cpassword: ""
 
   });
 
-  const {values,errors,handleSubmit,handleChange,handleBlur}=useFormik({
-    initialValues:{
+  const { values, errors, handleSubmit, handleChange, handleBlur } = useFormik({
+    initialValues: {
       firstname: "",
-    lastname: "",
-    email: "",
-    dob: "",
-    phonenumber:"",
-    password: "",
-    cpassword:""
+      lastname: "",
+      email: "",
+      dob: "",
+      phonenumber: "",
+      password: "",
+      cpassword: ""
     },
-    validationSchema:signUpSchema,
-    onSubmit:async(value) => {
+    validationSchema: signUpSchema,
+    onSubmit: async (value) => {
 
       try {
-           await axios.post('/signup',values)
+        if (user) {
+          await axios.post('/signup', values)
           setshowOtp(true)
-          } catch (error) {
-            console.log(error);
-          }
+        } else {
+          await axios.post('/doctor/signup', values)
+          setshowOtp(true)
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   });
-console.log();
+  console.log();
 
 
 
 
 
-  const [otp, setOtp] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [showOtp, setshowOtp] = useState(false)
+
 
   const handleOtp = (value) => {
     setOtp(value)
   }
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target
-  //   setFormData((prevdata) => ({
-  //     ...prevdata,
-  //     [name]: value
-  //   }))
-  // }
-
-
-  // const handleSubmit = async(e) => {
-  //   e.preventDefault()
-
-  //   try {
-  //    await axios.post('/signup',formData)
-
-  //   console.log(formData, 'formdata');
-  //   setshowOtp(true)
-  //   } catch (error) {
-      
-  //   }
-
-  // }
-
-
-  const handleOtpSubmit=async(e)=>{
-   e.preventDefault()
-   const email=values.email
-   const otpData={otp,email}
-try {
-    console.log(otpData,'otpdata');
-    const res=await axios.post("/verfyotp",otpData)
-  
-    console.log(res.data.message,'84');
-  if(res.data.message){
-   
-    toast.success("Registration successfull",{
-      position:toast.POSITION.TOP_CENTER,
-      autoClose:3000
-    })
-
-    navigate('/login')
+  const handleUser = () => {
+    setUser(!user)
   }
 
-} catch (error) {
-  
-}
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault()
+    const email = values.email
+    const otpData = { otp, email }
+    try {
+
+      if (user) {
+        const res = await axios.post("/verfyotp", otpData)
+
+        if (res.data.message) {
+
+          toast.success("Registration successfull", {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 3000
+          })
+
+          navigate('/login')
+        }
+      } else {
+        const res = await axios.post("/doctor/verfyotp", otpData)
+
+        if (res.data.message) {
+
+          toast.success("Registration successfull", {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 3000
+          })
+
+          navigate('/doctor-login')
+        }
+      }
+
+    } catch (error) {
+
+    }
 
   }
 
-   
-    // function onSignUp() {
-    //   setLoading(true);
-    
-      
-    //   function captchaVerify() {
-    //     return new Promise((resolve, reject) => {
-    //       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-    //         'size': 'normal',
-    //         'callback': (response) => {
-    //           onSignUp()
-  
-    //           // reCAPTCHA solved, allow signInWithPhoneNumber.
-    //           // ...
-    //           setshowOtp(true);
-             
-    //         },
-    //         'expired-callback': () => {
-    //           // Response expired. Ask user to solve reCAPTCHA again.
-    //           // ...
-    //         }
-    //       })
-         
-    //       if (window.recaptchaVerifier) {
-    //         resolve(); 
-    //       } else {
-    //         reject(new Error('Captcha verification failed')); 
-    //       }
-    //     });
-    //   }
-    //   captchaVerify().then(() => {
-    //       const appVerifier = window.recaptchaVerifier;
-        
-    //       const formatPh = '+' + formData.phonenumber;
-    
-    //       // Perform phone number authentication
-    //       signInWithPhoneNumber(auth, formatPh, appVerifier)
-    //         .then((confirmationResult) => {
-              
-    //           // Save the confirmation result to a variable for later use (e.g., in OTP verification)
-    //           window.confirmationResult = confirmationResult;
-    
-    //           // Update loading state and show OTP input
-    //           setLoading(false);
-    //           setshowOtp(true);
-    
-    //           // Show success message to the user
-    //           // toast.success('OTP sent successfully');
-    //           console.log('from signinWithPhoneNumber');
-    //         })
-    //         .catch((error) => {
-    //           console.log(error);
-    //           setLoading(false);
-    //           // Handle authentication error (e.g., display an error message to the user)
-    //         });
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //       setLoading(false);
-    //       // Handle captcha verification error (e.g., display an error message to the user)
-    //     });
-    // }
-
-    // function onOtpVerify(){
-    //   setLoading(true)
-    //   window.confirmationResult.confirm(otp).then(async(res)=>{
-    //     console.log(res);
-    //   }).catch(err=>{
-    //     console.log(err.message,'gggggggggggg');
-    //   })
-    //   }
-
-
-     
-
-
+  const handleCoundown = async () => {
+    const email = values.email
+    const otpData = { otp, email }
+    setCountDown(true)
+    if (user) {
+      const res = await axios.post("/signup", values)
+      setInterval(() => {
+        if (countDownTime > 0) {
+          setCountDownTime((prev) => prev - 1)
+        } else {
+          clearInterval()
+        }
+        setCountDown(false)
+      }, 1000)
+    } else {
+      const res = await axios.post("/doctor/signup", values)
+      setInterval(() => {
+        if (countDownTime > 0) {
+          setCountDownTime((prev) => prev - 1)
+        }
+        setCountDown(false)
+      })
+    }
+  }
 
   return (
-    <>
 
-      {
-        showOtp? <section className='bg-emerald-500 flex items-center justify-center h-screen'>
-          <div>
-          
-            <div className='w-80 flex flex-col gap-4 rounded-lg p-4'>
-              <h1 className='leading-normal text-white font-medium text-3xl mb-6'>OTP verification</h1>
-              <>
-                <div className=' bg-white text-emerald-400 w-fit mx-auto p-4 rounded-full'>
-                  <BsFillShieldLockFill size={30} />
+    <motion.div
+    className="box"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }} 
+    >
+      <>
 
+        {
+          showOtp ? <section className='bg-emerald-500 flex items-center justify-center h-screen'>
+            <div>
+
+              <div className='w-80 flex flex-col justify-center gap-4 rounded-lg p-4'>
+                <h1 className='leading-normal text-white font-medium text-3xl mb-6'>OTP verification</h1>
+                <>
+                  <div className=' bg-white text-emerald-400 w-fit mx-auto p-4 rounded-full'>
+                    <BsFillShieldLockFill size={30} />
+
+                  </div>
+                </>
+                <label htmlFor="ph" className='font-bold text-white text-3xl text-center'>
+                  Enter your otp
+                </label>
+                <OtpInput OTPLength={6} otpType="number" disabled={false} autofocus className="" value={otp} onChange={(e) => handleOtp(e)}></OtpInput>
+                <button className='bg-emerald-600 width-full items-center flex gap-2 py-5 mt-3 h-2 text-white rounded' onClick={(e) => handleOtpSubmit(e)}  >
+                  {
+                    loading && <CgSpinner className='mt-1 mx-7 animate-spin ' size={22} />
+                  }
+
+                  <span className='font-bold px-24'>Verify Otp</span>
+                </button>
+                <div className='flex flex-row justify-between'>
+                  <a className="text-red-600 cursor-pointer" >Login?</a>
+                  <div>
+                    {!countDown && <a className="text-blue-600 cursor-pointer" >Resend OTP  {countDownTime}</a>}
+                    {countDown && <a className="text-blue-600 cursor-pointer" onClick={() => handleCoundown()} >Resend OTP  <span className='text-white'>{countDownTime}</span></a>}
+
+                  </div>
                 </div>
-              </>
-              <label htmlFor="ph" className='font-bold text-white text-3xl text-center'>
-                Enter your otp
-              </label>
-              <OtpInput OTPLength={6} otpType="number" disabled={false} autofocus className="" value={otp} onChange={(e)=>handleOtp(e)}></OtpInput>
-              <button className='bg-emerald-600 width-full items-center flex gap-2 py-5 mt-3 h-2 text-white rounded' onClick={(e)=>handleOtpSubmit(e)}  >
-                {
-                  loading && <CgSpinner className='mt-1 mx-7 animate-spin ' size={22} />
-                }
-
-                <span className='font-bold px-24'>Verify Otp</span>
-              </button>
 
 
 
 
+              </div>
             </div>
-          </div>
-        </section> : <section> <div className="register">
-          <div className="col-1">
-            <h2 className='font-bold text-3xl'>Sign In</h2>
-            <span> register and enjoy the service</span>
+          </section> : <section className=''> <div className="register border-blue-600">
+            <div className="col-1">
+              {!user && <h2 className='font-bold text-3xl'>Doctor Sign Up</h2>}
+              {user && <h2 className='font-bold text-3xl'>User Sign Up</h2>}
+              <span> register and enjoy the service</span>
+              <Grid display={'flex'} flexDirection={'column'} justifyContent={'space-evenly'}>
+                <form id='form' className='flex flex-col' onSubmit={handleSubmit}>
 
-            <form id='form' className='flex flex-col' onSubmit={handleSubmit}>
-              <TextField id="outlined-basic" name='firstname' label="*firstname" variant="outlined" fullWidth className='mt-8' value={values.name} onBlur={handleBlur} onChange={handleChange} />
-              {<p className='form-error text-red-500'>{errors.firstname}</p>}
-              <TextField id="outlined-basic" name='lastname' label="*lastname" variant="outlined" fullWidth className='mt-8' value={values.name} onBlur={handleBlur} onChange={handleChange} />
-             
-              <TextField id="outlined-basic" name='phonenumber' label="*phonenumber" variant="outlined" fullWidth className='mt-8' value={values.phonenumber} onBlur={handleBlur} onChange={handleChange} />
-              {<p className='form-error text-red-500'>{errors.phonenumber}</p>}
-              <TextField id="outlined-basic" name='email' label="*email" variant="outlined" fullWidth className='mt-8' value={values.email} onBlur={handleBlur} onChange={handleChange} />
-              {<p className='form-error text-red-500'>{errors.email}</p>}
-              <LocalizationProvider className='w-100' dateAdapter={AdapterDayjs}>
+
+
+                  <TextField id="outlined-basic" name='firstname' label="*firstname" variant="outlined" fullWidth sx={{ marginTop: '0.5rem', marginBottom: '0.5rem' }} value={values.name} onBlur={handleBlur} onChange={handleChange} />
+                  {<FormLabel sx={{ color: 'red' }}>{errors.firstname}</FormLabel>}
+                  <TextField id="outlined-basic" name='lastname' label="*lastname" variant="outlined" sx={{ marginTop: '0.5rem', marginBottom: '0.5rem' }} fullWidth value={values.name} onBlur={handleBlur} onChange={handleChange} />
+
+                  <TextField id="outlined-basic" name='phonenumber' label="*phonenumber" variant="outlined" fullWidth sx={{ marginTop: '0.5rem', marginBottom: '0.5rem' }} value={values.phonenumber} onBlur={handleBlur} onChange={handleChange} />
+                  {<FormLabel sx={{ color: 'red' }}>{errors.phonenumber}</FormLabel>}
+                  <TextField id="outlined-basic" name='email' label="*email" variant="outlined" fullWidth sx={{ marginTop: '0.5rem', marginBottom: '0.5rem' }} value={values.email} onBlur={handleBlur} onChange={handleChange} />
+                  {<FormLabel sx={{ color: 'red' }}>{errors.email}</FormLabel>}
+                  {/* <LocalizationProvider className='w-100' dateAdapter={AdapterDayjs}>
                 <DemoContainer components={['DatePicker']}>
                   <DatePicker label="Date of Birth" />
                 </DemoContainer>
-              </LocalizationProvider>
-              <TextField id="outlined-basic" name='password' label="*password" variant="outlined" fullWidth className='mt-8' value={values.password} onBlur={handleBlur} onChange={handleChange} />
-              {<p className='form-error text-red-500'>{errors.password}</p>}
-              <TextField id="outlined-basic" label="*confirm password" name='cpassword' variant="outlined" fullWidth className='mt-8' value={values.cpassword} onBlur={handleBlur} onChange={handleChange} />
-              {<p className='form-error text-red-500'>{errors.cpassword}</p>}
-              {/* <Toaster toastOptions={{duration:4000}} /> */}
-            <div id='recaptcha-container'></div>
-              <button className='btn'>Sign In</button>
-            </form>
+              </LocalizationProvider> */}
+                  <TextField id="outlined-basic" name='password' type='password' label="*password" variant="outlined" fullWidth sx={{ marginTop: '0.5rem', marginBottom: '0.5rem' }} value={values.password} onBlur={handleBlur} onChange={handleChange} />
+                  {<FormLabel sx={{ color: 'red' }}>{errors.password}</FormLabel>}
+                  <TextField id="outlined-basic" label="*confirm password" type='password' name='cpassword' variant="outlined" fullWidth sx={{ marginTop: '0.5rem', marginBottom: '0.5rem' }} value={values.cpassword} onBlur={handleBlur} onChange={handleChange} />
+                  {<FormLabel sx={{ color: 'red' }}>{errors.cpassword}</FormLabel>}
+                  {/* <Toaster toastOptions={{duration:4000}} /> */}
 
-          </div>
-          <div className="col-2">
-            <img src={bgImg} alt="" />
-          </div>
-        </div>
-       </section>
-      }
+                  <button className='btn' type='submit'>Sign Up</button>
+                </form>
+              </Grid>
+             <div className='flex justify-between'>
+             {user && <div className="text-black items-end">
+                Register as <a className="text-red-600 cursor-pointer" onClick={() => handleUser()}>Doctor?</a>
 
-    </>
+              </div>
+              }
+              {!user && <div className="text-black items-end">
+
+                Register as <a className="text-red-600 cursor-pointer" onClick={() => handleUser()}>User?</a>
+              </div>}
+               <div className="text-black items-end">
+             <a className="text-blue-500 cursor-pointer" onClick={() => handleLogin()}>Login here..</a>
+              </div>
+             </div>
+
+
+            </div>
+            <div className="col-2">
+              <img src={bgImg2} alt="" />
+            </div>
+          </div>
+          </section>
+        }
+
+      </>
+    </motion.div>
   )
 }

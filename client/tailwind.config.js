@@ -12,10 +12,11 @@ module.exports = {
         '128': '32rem',
       },
       colors:{
-        "dark-purple":"#081A51",
+        "dark-purple":"#171c99",
+        "grey-shade":"#f0f0f5",
         'light-white':'rgba(255,255,255,0.18)',
         "light-grey":"#EEEEEE",
-        "customSidebarColor": '#081A51'
+         "customSidebarColor": '#081A51'
       }
 
   },

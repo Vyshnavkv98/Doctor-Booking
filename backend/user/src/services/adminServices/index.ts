@@ -3,8 +3,12 @@ import NotFoundError from "../../utils/notFoundError";
 import env from "../../environment/env";
 import jwt from "jsonwebtoken";
 import admin from "../../models/admin"
+import AdminRepository from "../../repositories/adminRepository";
+import DepartmentRepository from "../../repositories/DepartmentRepository";
+import { IDepartment } from "../../models/interface";
 
-
+const adminRepository = new AdminRepository()
+const departmentRepository=new DepartmentRepository()
 
 
 type adminDataType = {
@@ -13,7 +17,7 @@ type adminDataType = {
 };
 
 type jwtType = {
-   iv: Buffer,
+    iv: Buffer,
     _id: string
 };
 
@@ -22,7 +26,7 @@ const adminStaticType = unknownadminType as {
     findByCreds: (email: string, password: string) => Promise<adminInterface>;
 };
 
-class adminServices {
+class AdminServices {
     constructor() {
     }
 
@@ -49,7 +53,7 @@ class adminServices {
 
         return { admin, accessToken, refreshToken }
     }
- 
+
     logout = async (userid: string, refreshToken: string) => {
 
         const admin = await Admin.findById(userid)
@@ -87,6 +91,19 @@ class adminServices {
         admin.tokens = [];
         await admin.save();
     }
+    getDocData = async () => {
+        const doctorDetails = await adminRepository.getDoctors()
+        return doctorDetails
+    }
+    addNewDepartment=async(departmentData:IDepartment)=>{
+        const departmentDetails=await departmentRepository.addDepartment(departmentData)
+        if (departmentDetails==null) throw new NotFoundError("Could Not Find the department");
+        return departmentDetails
+    }
 
+    getAllDepartmentDetail=async()=>{
+        const departmentDetails=await departmentRepository.getDepartments()
+        return departmentDetails
+    }
 }
-export default adminServices;
+export default AdminServices;

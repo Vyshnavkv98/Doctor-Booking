@@ -13,6 +13,9 @@ import * as yup from "yup"
 
 
 import { userLoginValidator } from '../../validation/UserValidator';
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../../redux/user';
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 
@@ -30,6 +33,14 @@ function Login() {
     email: '',
     password: ''
   })
+
+  useEffect(() => {
+    const token = localStorage.getItem('access-token')
+    if (token) {
+      navigate('/user/home')
+    }
+  })
+
   const handleChange = (event) => {
     const { name, value } = event.target
     setFormData((prevData) => ({
@@ -37,24 +48,28 @@ function Login() {
       [name]: value
     }))
   }
-
+  const dispatch = useDispatch()
   const handleRegister = () => {
     navigate('/signup')
   }
+  const handleDoctor = () => {
+    navigate('/doctor-login')
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    // if (formData.email === "" || formData.password === "") {
-    //   // toast("sorry", "All fields are required!", "error");
-    // } else {
+    console.log(e, 48);
+    e.preventDefault()
+
     try {
       console.log('handle login');
       const { email, password } = formData
 
       const isValid = await userLoginValidator.isValid(formData)
+      console.log(isValid);
       if (!isValid) {
-        setError(isValid.message)
+        setError('Please enter valid email address')
       }
+      console.log(loginError);
 
       await axios.post("login", {
         email: email,
@@ -69,6 +84,7 @@ function Login() {
             localStorage.setItem('refresh-token', refreshToken);
 
             setLoginStatus(true);
+            dispatch(loginUser(formData))
             toast.success("Login successfull", {
               position: toast.POSITION.TOP_CENTER,
               autoClose: 500
@@ -93,47 +109,63 @@ function Login() {
 
 
   return (
-    <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0 bg-black">
-      <div className="md:w-1/3 max-w-sm">
+    <motion.div
+      className="box"
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.8,
+        delay: 0.5,
+        ease: [0, 0.71, 0.2, 1.01]
+      }}
+    >
+      <section className="h-screen flex flex-col md:flex-col justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0 bg-black">
+        <div className="md:w-1/3 max-w-sm">
 
-        <img
-          src={bgImg5}
-          alt="Sample image" className='tex-white mx-8' />
-      </div>
-      <h2 className='text-white font-bold text-3xl' > Sign In</h2>
-      <div className="md:w-1/3 max-w-sm">
-        <div className="text-center md:text-left">
-
-
-
+          <img
+            src={bgImg5}
+            alt="Sample image" className='tex-white mx-8' />
         </div>
-        <div className="my-5 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300">
-          <p className="mx-4 mb-0 text-center font-semibold text-slate-500">Or</p>
-        </div>
-        <p>{loginError}</p>
-        <form onSubmit={(e) => handleSubmit(e)}>
-          {loginError && <input className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded text-white" type="text" value={loginError} />
-          }
-          <input className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded" name='email' type="text" placeholder="Email Address" onChange={handleChange} />
-          <input className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4" name='password' type="password" placeholder="Password" onChange={handleChange} />
-          <div className="mt-4 flex justify-between font-semibold text-sm">
-            <label className="flex text-slate-500 hover:text-slate-600 cursor-pointer">
-
-            </label>
-            <a className="text-blue-600 hover:text-blue-700 hover:underline hover:underline-offset-4" href="#">Forgot Password?</a>
-          </div>
+        <h2 className='text-white font-bold text-3xl' > Sign In</h2>
+        <div className="md:w-1/3 max-w-sm">
           <div className="text-center md:text-left">
-            <button className="mt-4 bg-green-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider w-full h-11" type="submit"  >Login</button>
+
+
 
           </div>
-        </form>
-        <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left mt-5">
-          Don't have an account? <a className="text-red-600 hover:underline hover:underline-offset-4" onClick={() => handleRegister()}>Register</a>
+          <div className="my-5 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300">
+            <p className="mx-4 mb-0 text-center font-semibold text-slate-500">Or</p>
+
+          </div>
+
+          <p color='red' style={{ color: 'red' }}>{loginError}</p>
+          <form onSubmit={(event) => handleSubmit(event)}>
+            {/* {loginError && <input className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded text-white" type="text" value={loginError} />
+          } */}
+            <input className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded" name='email' type="text" placeholder="Email Address" onChange={handleChange} />
+            <input className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4" name='password' type="password" placeholder="Password" onChange={handleChange} />
+            <div className="mt-4 flex justify-between font-semibold text-sm">
+              <label className="flex text-slate-500 hover:text-slate-600 cursor-pointer ">
+
+              </label>
+              <a className="text-blue-600 hover:text-blue-700 hover:underline hover:underline-offset-4" href="#">Forgot Password?</a>
+            </div>
+            <div className="text-center md:text-left">
+              <button className="mt-4 bg-green-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider w-full h-11"   >Login</button>
+
+            </div>
+          </form>
+          <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left mt-5 flex justify-between">
+            <div>
+              Don't have an account? <a className="text-red-600 hover:underline hover:underline-offset-4" onClick={() => handleRegister()}>Register</a>
+
+            </div>
+            <a className="text-red-600 hover:underline hover:underline-offset-4 text-blue-400" onClick={() => handleDoctor()}>Doctor?</a>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-
+    </motion.div>
 
   )
 }

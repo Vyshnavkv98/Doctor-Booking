@@ -10,17 +10,9 @@ import App from './App';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebase';
 import { ContextProvider } from './context/ContextProvider';
+import store from './store';
 initializeApp(firebaseConfig);
 
-
-
-
-const store = configureStore({
-  reducer: {
-    user: userReducer,
-    admin: adminReducer
-  }
-})
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
