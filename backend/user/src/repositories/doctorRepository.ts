@@ -4,6 +4,8 @@ import NotFoundError from "../utils/notFoundError";
 import { useStderr } from "../../jest.config";
 import { doctorCache } from '../interfaces/doctorCache'
 import { ISlotInterface } from "../interfaces/doctorSlot";
+import { Department } from "../models/departments";
+import InternalServerError from "../utils/InternalServerError";
 
 
 
@@ -33,10 +35,17 @@ class DoctorRepository {
         RegistrationYear: doctorData?.registrationYear,
         RegisterNumber: doctorData?.registerNumber,
         imgUrl: doctorData?.imgUrl,
-        image: doctorData?.image
+        image: doctorData?.image,
+        AddressLine1:doctorData?.AddressLine1,
+        AddressLine2:doctorData?.AddressLine2,
+        offline:doctorData.offline,
+        chat:doctorData.chat,
+        video:doctorData.video,
+        videoConsultationSlots:[]
 
       },
       { new: true })
+      
     return updatedDoctor
   }
 
@@ -85,6 +94,12 @@ class DoctorRepository {
     const doctor = Doctor.findById({_id:id})
     return doctor
   }
+
+  async getDepartments(){
+    const departments=await Department.find()
+    if(!departments) throw new InternalServerError('internal server error for getting department data')
+    return departments
+}
 
 
 }

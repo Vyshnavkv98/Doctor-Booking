@@ -98,15 +98,44 @@ const doctorSchema = new mongoose.Schema({
   image: {
     type: String,
   },
+  AddressLine1:{
+    type:String
+  },
+  AddressLine2:{
+    type:String
+  },
   documents: {
     type: Array,
   },
+  videoConsultationSlots: [
+    {
+     date:{
+       type:String,
+     },
+     slots:{
+       type:Array
+     }
+    }
+   ],
   token: {
     type: Array,
   },
   blockReason: {
     type: String
-  }
+  },
+  offline:{
+    type:Boolean,
+    default:true
+  },
+  chat:{
+    type:Boolean,
+    default:false
+  },
+  video:{
+    type:Boolean,
+    default:false
+    
+  },
 
 }, { timestamps: true });
 

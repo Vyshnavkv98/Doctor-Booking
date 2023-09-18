@@ -14,6 +14,11 @@ import ListAllDoctor from '../pages/user/doctorList/ListAllDoctor';
 import ProfilePage from '../pages/user/ProfilePage';
 import {ProtectedRoute} from '../services/ProtectedRouter'
 import PaymentSuccess from '../components/user/payment/PaymentSuccess';
+import ConfirmAppointment from '../components/modal/ConfirmAppointment';
+import DoctorProfile from '../pages/user/doctorProfile/DoctorProfile';
+import FindDoctorVideoConsultation from '../components/user/videoConsultation/FindDoctorVideoConsultation';
+import SearchDoctorVideoConsultation from '../pages/user/findDoctorVideo/SearchDoctorVideoConsultation';
+import DoctorListVideo from '../pages/user/findDoctorVideo/DoctorListVideo';
 
 
 
@@ -38,6 +43,9 @@ const AnimationWrapper = () => {
             <Route path='/doctor-book' element={<ListAllDoctor />}></Route>
             <Route path='/appointment' element={<AppointmentConfirmation />}></Route>
             <Route path='/payment-success' element={<PaymentSuccess />}></Route>
+            <Route path='/doctor-profileinfo' element={<DoctorProfile />}></Route>
+            <Route path='/video-consultation' element={<SearchDoctorVideoConsultation />}></Route>
+            <Route path='/doctor-book-video-consultation' element={<DoctorListVideo />}></Route>
           </Route>
       </Routes>
     </AnimatePresence>

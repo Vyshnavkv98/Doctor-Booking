@@ -1,7 +1,9 @@
 import { Appointment } from "../models/appointments";
+import { Department } from "../models/departments";
 import { Doctor } from "../models/doctorModel";
 import { IAppointmentDataType, IAppointmentInterface, userEditType } from "../models/interface";
 import User from "../models/user";
+import InternalServerError from "../utils/InternalServerError";
 import NotFoundError from "../utils/notFoundError";
 
 
@@ -39,9 +41,6 @@ class UserRepository {
 
         const{name,email,reason,fee,mobile,date,time,userId,doctorId,doctorFee}=appointmentData
         
-       
-        
-
         const addedAppointment= new Appointment({
             user:userId,
             doctor:doctorId,
@@ -59,6 +58,12 @@ class UserRepository {
         if(addedAppointment) return addedAppointment
         else throw new Error('Add appointment failed')
         
+    }
+
+    async getDepartments(){
+        const departments=await Department.find()
+        if(!departments) throw new InternalServerError('internal server error for getting department data')
+        return departments
     }
 
 }

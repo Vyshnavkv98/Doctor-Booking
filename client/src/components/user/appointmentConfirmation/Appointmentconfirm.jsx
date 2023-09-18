@@ -1,18 +1,19 @@
-import { Box, Button, Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, MenuItem, Paper, Radio, RadioGroup, Select, TextField, Typography } from '@mui/material'
+import { Box, Button, Divider, FormControl, FormControlLabel, FormLabel, Grid, MenuItem,Link, Paper, Radio, RadioGroup, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import HomeIcon from '@mui/icons-material/Home';
 import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import { Form, useLocation } from 'react-router-dom';
+import { Form, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import { AppointmentSchema } from '../../../helper/AppointmentSchema';
 import axios from '../../../axios/axios'
+// import {Link} from 'react-router-dom'
 import appointment from '../../../redux/appointment'
 import {loadStripe} from '@stripe/stripe-js'
 
 function Appointmentconfirm() {
-
+  const navigate=useNavigate()
   const dispatch = useDispatch()
   const [doctor, setDoctor] = useState({})
   const [userDetails, setUserDetails] = useState({})
@@ -25,9 +26,15 @@ function Appointmentconfirm() {
     setDoctor({ ...doctors })
 
     const slotData = location.state
-    setSlotdata(slotData)
+    setSlotdata(slotData.doctor)  
 
   }, [])
+  
+  const handleViewDoctorProfile=()=>{
+
+    navigate('/doctor-profileinfo',{state:slotdata})
+    
+  }
   const { errors, handleSubmit, handleBlur, handleChange, values } = useFormik({
     initialValues: {
       name: `${userData?.firstName} ${userData?.lastName}` || '',
@@ -42,9 +49,8 @@ function Appointmentconfirm() {
 
         const appointmentData = { ...slotdata, name: values.name, mobile: values.mobile,email: values.email, reason: values.reason, fee: values.consultaionFee, userId: userData._id, doctorId: doctor._id }
         const appointmentDetails = await axios.post('/add-appointment', appointmentData)
-        if (appointmentDetails !== undefined) {
-          
-          // dispatch(appointment(appointmentDetails))
+        if (appointmentDetails !== undefined) {  
+           dispatch(appointment(appointmentDetails))
           const paymetInfo={name:values.name,RegisterFee:500}
           await axios.post("/create-checkout-session",paymetInfo)
           .then((res)=>{
@@ -136,6 +142,10 @@ function Appointmentconfirm() {
                     Public Health Dentist, Dental Surgeon
                   </Typography>
 
+                </Grid>
+
+                <Grid color={'blue'}>
+                <Link onClick={handleViewDoctorProfile}    sx={{cursor:'pointer'}}  >View Doctor profile</Link>
                 </Grid>
 
 

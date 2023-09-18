@@ -10,6 +10,7 @@ function Table() {
     const [users, setUsers] = useState([]);
     const [laoding, setLoading] = useState(false)
     const [modalOpen, setModalOpen] = useState(false);
+    const[refresh,setRefresh]=useState(true)
 
     const openModal = () => {
         setModalOpen(true);
@@ -23,6 +24,7 @@ function Table() {
 
     const handleBlock = () => {
         setBlock(!block)
+        setRefresh(!refresh)
         setLoading(true)
         const userData = { _id: users[0]._id, blockStatus: block }
         axios.post('/admin/block-user', userData)
@@ -41,7 +43,7 @@ function Table() {
             }
         };
         fetchUsers();
-    }, [block]);
+    }, [refresh]);
 
 
     return (

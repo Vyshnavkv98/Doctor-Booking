@@ -1,5 +1,5 @@
 import User, { userInterface } from "../../models/user"
-import {Request, Response} from 'express'
+import { Request, Response } from 'express'
 import bcrypt from "bcrypt"
 import env from "../../environment/env";
 import jwt from "jsonwebtoken"
@@ -15,7 +15,7 @@ import mongoose, { Number } from "mongoose";
 import paymentService from '../../utils/paymentService'
 import { IPaymentInterface } from "../../interfaces/doctorSlot";
 
-const userRepository=new UserRepository()
+const userRepository = new UserRepository()
 
 const userCache = new NodeCache()
 const otpCache = new NodeCache()
@@ -63,45 +63,45 @@ class userServices {
         }
         userCache.set(userData.email!, userData)
         otpCache.set(userData.email!, response)
-        console.log(response,'from sentemail');
-        
+        console.log(response, 'from sentemail');
 
-        
+
+
 
     }
 
-    verifyOtp = async (otp: string,email:string) => {
+    verifyOtp = async (otp: string, email: string) => {
 
-        console.log(email,'verify otp 56');
-        
-        const userData:any=userCache.get(email)
-        const genOtp =otpCache.get(email)
-        console.log(genOtp,otp);
-        const isRegistered=await userRepository.isExist(email)
+        console.log(email, 'verify otp 56');
 
-        if(isRegistered){
+        const userData: any = userCache.get(email)
+        const genOtp = otpCache.get(email)
+        console.log(genOtp, otp);
+        const isRegistered = await userRepository.isExist(email)
+
+        if (isRegistered) {
             throw new Error('Email already exist')
         }
-        
-        if(otp===genOtp){
+
+        if (otp === genOtp) {
             const user = new User({
                 firstName: userData.firstname,
                 lastName: userData.lastname,
                 email: userData.email,
                 emailVerified: false,
-                phoneNumber:userData.phoneNumber,
+                phoneNumber: userData.phoneNumber,
                 password: userData.password
-    
+
             })
-    
+
             await user.save()
             if (!user) throw new NotFoundError("User not Found")
             else return user
-        }else{
+        } else {
             return false
         }
 
-        }
+    }
 
 
     login = async (userData: userDataType, uuid: string | undefined) => {
@@ -114,8 +114,8 @@ class userServices {
         const user = await UserStaticType.findByCreds(email, password);
 
         if (!user) throw new NotFoundError("Cannot Find User");
-        
-        
+
+
 
         const { accessToken, refreshToken } = await user.generateAuthToken(uuid);
         console.log(accessToken, refreshToken, 'service');
@@ -164,23 +164,29 @@ class userServices {
         user.tokens = [];
         await user.save();
     }
-    updateEditedUserData=async(userData:userEditType)=>{
-       const response= await userRepository.updateEditedUserProfile(userData)
+    updateEditedUserData = async (userData: userEditType) => {
+        const response = await userRepository.updateEditedUserProfile(userData)
     }
 
-    doctorList=async()=>{
-       const doctors=await userRepository.getDoctors()
-       return doctors
+    doctorList = async () => {
+        const doctors = await userRepository.getDoctors()
+        return doctors
     }
 
-    offlineAppointmentConfirm=async(appointmentData:IAppointmentDataType)=>{
-        const addedAppointmentData=await userRepository.addOfflineAppointmentData(appointmentData)
-            return addedAppointmentData
+    offlineAppointmentConfirm = async (appointmentData: IAppointmentDataType) => {
+        const addedAppointmentData = await userRepository.addOfflineAppointmentData(appointmentData)
+        return addedAppointmentData
     }
 
-    confirmPayment=async(req:Request,res:Response,doctorData:IPaymentInterface)=>{
-     const response=await paymentService(req,res,doctorData)
-     return response
+    confirmPayment = async (req: Request, res: Response, doctorData: IPaymentInterface) => {
+        const response = await paymentService(req, res, doctorData)
+        return response
+    }
+
+    getDepartments = async () => {
+        const departmentDetails = await userRepository.getDepartments()
+
+        if (departmentDetails) return departmentDetails
     }
 
 }

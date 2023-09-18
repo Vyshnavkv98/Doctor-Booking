@@ -12,8 +12,13 @@ export const signUpSchema=Yup.object({
 
 export const doctorVerifySchema=Yup.object({
     firstName:Yup.string().min(3).max(15).required("Please enter your name"),
+    AddressLine1:Yup.string().required("Please Your address"),
+    AddressLine2:Yup.string().required("Please fill this field"),
     specialization:Yup.string().required('Please select your specialization'),
     gender:Yup.string().required(),
+    offline:Yup.string().required('please select the field'),
+    chat:Yup.string().required('please select the field'),
+    video:Yup.string().required('please select the field'),
     city:Yup.string().required('Please select your city'),
     registerNumber:Yup.string().required('Please enter the register number'),
     registrationCouncil:Yup.string().required('Please select the reg council'),

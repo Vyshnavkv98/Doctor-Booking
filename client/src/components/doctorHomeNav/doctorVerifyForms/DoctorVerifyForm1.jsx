@@ -75,12 +75,17 @@ export default function DoctorVerifyForm1() {
       specialization: '',
       gender: '',
       city: '',
-      RegisterFee:0,
+      RegisterFee: 0,
       registrationCouncil: '',
       registerNumber: '',
       registrationYear: '',
+      offline:true,
+      chat:false,
+      video:false
+
 
     },
+
     validationSchema: doctorVerifySchema,
     onSubmit: async (values) => {
       try {
@@ -103,7 +108,6 @@ export default function DoctorVerifyForm1() {
             },
 
           });
-
 
           uploadPromises.push(uploadPromise);
         }
@@ -139,9 +143,22 @@ export default function DoctorVerifyForm1() {
     },
   });
 
+
+
   const [firstForm, setFirstForm] = React.useState(false)
+  const [depNames, setDepNames] = React.useState([])
 
-
+  React.useEffect(() => {
+    const department = async () => {
+      const res = await axios.get("/get-departments")
+      let depname = []
+      const names = res?.data?.departments.forEach((item) => {
+        depname.push(item.departmentName)
+      })
+      setDepNames([...depname])
+    }
+    department()
+  }, [])
 
 
   const names = [
@@ -183,7 +200,7 @@ export default function DoctorVerifyForm1() {
         {!firstForm && <FormControl>
           <Box
             sx={{
-              marginTop: 8,
+              marginTop: 6,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -224,7 +241,7 @@ export default function DoctorVerifyForm1() {
                     onChange={handleChange}
                     input={<OutlinedInput label="Specilization" />}
                   >
-                    {names.map((name) => (
+                    {depNames.map((name) => (
                       <MenuItem
                         key={name}
                         value={name}
@@ -271,6 +288,36 @@ export default function DoctorVerifyForm1() {
                   </Select>
                   {<p className='form-error text-red-500'>{errors.city}</p>}
                 </Grid>
+                <Grid xs={12} display={'flex'} mt={1} ml={2}>
+                  <Grid item xs={12} >
+                    <FormLabel id="demo-row-radio-buttons-group-label">Video Consultation?</FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby="demo-row-radio-buttons-group-label"
+                      name="video"
+                      onChange={handleChange}
+                    >
+                      <FormControlLabel value="yes" name='video' control={<Radio />} label="Yes" />
+                      <FormControlLabel value="no" name='video' control={<Radio />} label="No" />
+
+                    </RadioGroup>
+                    {<FormHelperText sx={{ fontSize: 15 }} error='true'>{errors.video}</FormHelperText>}
+                  </Grid>
+                  <Grid item xs={12} >
+                    <FormLabel id="demo-row-radio-buttons-group-label">Chat consultation?</FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby="demo-row-radio-buttons-group-label"
+                      name="chat"
+                      onChange={handleChange}
+                    >
+                      <FormControlLabel value="yes" name='chat' control={<Radio />} label="Yes" />
+                      <FormControlLabel value="no" name='chat' control={<Radio />} label="No" />
+
+                    </RadioGroup>
+                    {<FormHelperText sx={{ fontSize: 15 }} error='true'>{errors.chat}</FormHelperText>}
+                  </Grid>
+                </Grid>
                 <Grid item xs={12} >
                   <TextField
                     autoComplete="profilepic"
@@ -285,18 +332,7 @@ export default function DoctorVerifyForm1() {
                     onChange={(e) => handleChangeProfileImg(e)}>
 
                   </TextField>
-                  {/* <Box
-                    component="img"
-                    sx={{
-                      height: 250,
-                      width: 250,
-                      maxHeight: { xs: 45, md: 45 },
-                      maxWidth: { xs: 45, md: 45 },
-                    }}
-                    src={profile}
-                    alt="The house from the offer."
-                    
-                  /> */}
+
                   {isUploading && <CircularProgress />}
                   <Snackbar
                     open={isSnackbarOpen}
@@ -308,6 +344,20 @@ export default function DoctorVerifyForm1() {
 
                   {<FormHelperText sx={{ fontSize: 15 }} error='true'>{errors.docs}</FormHelperText>}
                 </Grid>
+                <Grid item xs={12} >
+                    <FormLabel id="demo-row-radio-buttons-group-label">Offline Consultation?</FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby="demo-row-radio-buttons-group-label"
+                      name="offline"
+                      onChange={handleChange}
+                    >
+                      <FormControlLabel value="yes" name='offline' control={<Radio />} label="Yes" />
+                      <FormControlLabel value="no" name='offline' control={<Radio />} label="No" />
+
+                    </RadioGroup>
+                    {<FormHelperText sx={{ fontSize: 15 }} error='true'>{errors.offline}</FormHelperText>}
+                  </Grid>
 
               </Grid>
               <Button
@@ -417,6 +467,34 @@ export default function DoctorVerifyForm1() {
                       onChange={handleChange}
                     />
                     {<FormHelperText sx={{ fontSize: 15 }} error='true'>{errors.registrationYear}</FormHelperText>}
+                  </Grid>
+                  <Grid item xs={12} >
+                    <TextField
+                      autoComplete="AddressLine1"
+                      name="AddressLine1"
+                      required
+                      fullWidth
+                      id="AddressLine1"
+                      label="AddressLine1"
+                      autoFocus
+                      value={values.AddressLine1}
+                      onChange={handleChange}
+                    />
+                    {<FormHelperText sx={{ fontSize: 15 }} error='true'>{errors.AddressLine2}</FormHelperText>}
+                  </Grid>
+                  <Grid item xs={12} >
+                    <TextField
+                      autoComplete="AddressLine2"
+                      name="AddressLine2"
+                      required
+                      fullWidth
+                      id="AddressLine2"
+                      label="AddressLine2"
+                      autoFocus
+                      value={values.AddressLine2}
+                      onChange={handleChange}
+                    />
+                    {<FormHelperText sx={{ fontSize: 15 }} error='true'>{errors.AddressLine2}</FormHelperText>}
                   </Grid>
                   <Grid item xs={12} >
                     <TextField

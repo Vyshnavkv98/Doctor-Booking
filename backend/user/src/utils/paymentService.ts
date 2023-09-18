@@ -8,6 +8,12 @@ const DOMAIN = 'http://localhost:3000'
 const paymentService = async ( req: Request, res: Response,doctorData: IPaymentInterface) => {
   try {
     console.log(doctorData,'from payment');
+
+    const customer=await stripe.customers.create({
+      metadata:{
+        regFee:doctorData.RegisterFee
+      }
+    })
     
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],

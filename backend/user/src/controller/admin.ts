@@ -181,9 +181,9 @@ class adminController {
     addDepartment = async (req: RequestType, res: Response) => {
         try {
             const departmentData=req.body
-            
+
             const departments=await adminProvider.addNewDepartment(departmentData)
-            
+            return departments
 
         } catch (e: any) {
             console.log("\nadd-department All admin route Error:", e.message);

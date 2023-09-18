@@ -33,7 +33,6 @@ function DoctorList({ doctors }) {
   }, [doctors])
 
   const goToPrevItem = (contentItems, index) => {
-    console.log(contentItems);
     setCurrentIndex((prevIndex) => (prevIndex - 1 + contentItems.length) % contentItems.length);
   };
 

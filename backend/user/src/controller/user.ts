@@ -6,6 +6,9 @@ import NotFoundError from "../utils/notFoundError";
 import InternalServerError from "../utils/InternalServerError";
 import { randomUUID } from "crypto";
 import { error } from "console";
+const stripe = require('stripe')('sk_test_51Np894SEixsZ4knFgXnSgfwowqNNIFKweTSrkkfd5lFH4XYuVgWNkScisVzhbOmkToUIT00km3q32Uej3EvVNSTw00YVlxh9ls');
+const endpointSecret = "whsec_f2700ff9d76be75a2e19fc3ff20c83d878634d40b148e45ce89c77e87ff2ebbf";
+
 
 const userProvider = new userServices()
 
@@ -64,7 +67,7 @@ class UserController {
         } catch (e: any) {
             console.log("\nverify otp:", e.message);
             const code = !e.code ? 500 : e.code >= 400 && e.code <= 599 ? e.code : 500;
-            res.status(code).send({message:e.message});
+            res.status(code).send({ message: e.message });
         }
     }
 
@@ -178,72 +181,119 @@ class UserController {
 
             console.log("\nLogout All User Route Error:", e.message);
             const code = !e.code ? 500 : e.code >= 400 && e.code <= 599 ? e.code : 500;
-            res.status(code).send({message:e.meesage});
+            res.status(code).send({ message: e.meesage });
         }
     }
     editUserProfile = async (req: RequestType, res: Response) => {
         try {
-            const userData=req.body
-            const userDetails=await userProvider.updateEditedUserData(userData)
-            res.status(201).send({userData:userData,message:'Details updated successfully'})
-        } catch (e:any) {
+            const userData = req.body
+            const userDetails = await userProvider.updateEditedUserData(userData)
+            res.status(201).send({ userData: userData, message: 'Details updated successfully' })
+        } catch (e: any) {
             console.log("\nLogout All User Route Error:", e.message);
             const code = !e.code ? 500 : e.code >= 400 && e.code <= 599 ? e.code : 500;
-            res.status(code).send({message:e.meesage});
+            res.status(code).send({ message: e.meesage });
         }
     }
 
-    getDocorList=async (req: RequestType, res: Response) => {
+    getDocorList = async (req: RequestType, res: Response) => {
 
         try {
-            const response=await userProvider.doctorList()
+            const response = await userProvider.doctorList()
             console.log(response);
-            
-            if(response){
+
+            if (response) {
                 console.log(response);
-                
+
                 res.status(200).send(response)
             }
-            
-        } catch (e:any) {
+
+        } catch (e: any) {
             console.log("\nLogout All User Route Error:", e.message);
+            const code = !e.code ? 500 : e.code >= 400 && e.code <= 599 ? e.code : 500;
+            res.status(code).send({ message: e.meesage })
+        }
+
+    }
+    confirmOfflineAppointment = async (req: RequestType, res: Response) => {
+        try {
+            const appointmentData = req.body
+        if (!appointmentData) throw new NotFoundError("Resource not found");
+
+        const updatedAppointment = await userProvider.offlineAppointmentConfirm(appointmentData)
+
+        if (updatedAppointment) {
+            res.status(201).send({ appointmentData: updatedAppointment, message: 'Appointment Added successfully' })
+        }
+        } catch (e:any) {
+            console.log("\nappointment User Route Error:", e.message);
             const code = !e.code ? 500 : e.code >= 400 && e.code <= 599 ? e.code : 500;
             res.status(code).send({message:e.meesage})
         }
 
-    }
-  confirmOfflineAppointment=async(req:RequestType,res:Response)=>{
-    const appointmentData=req.body
-    if(!appointmentData)  throw new NotFoundError("Resource not found");
 
-    const updatedAppointment=await userProvider.offlineAppointmentConfirm(appointmentData)
-
-    if(updatedAppointment){
-        res.status(201).send({appointmentData:updatedAppointment,message:'Appointment Added successfully'})
     }
 
+    paymentConfirm = async (req: Request, res: Response) => {
+        try {
+            const doctorData = req.body;
+            console.log(doctorData, 'payment confirm');
 
-  }
+            const paymentDetail = await userProvider.confirmPayment(req, res, doctorData);
 
-  paymentConfirm = async (req: Request, res: Response) => {
-    try {
-      const doctorData  = req.body;
-      console.log(doctorData,'payment confirm');
-  
-      const paymentDetail = await userProvider.confirmPayment(req,res, doctorData);
-     
-      
-  
-      res.status(200).json({ success: true, paymentDetail });
-    } catch (error) {
-      console.error(error);
-  
-      res.status(500).json({ success: false, error: 'Payment confirmation failed' });
+
+
+            res.status(200).json({ success: true, paymentDetail });
+        } catch (e: any) {
+            console.log("\nLogout All User Route Error:", e.message);
+            const code = !e.code ? 500 : e.code >= 400 && e.code <= 599 ? e.code : 500;
+            res.status(code).send({ message: e.meesage })
+        }
+    };
+
+    webhookControl = async (req: RequestType, res: Response) => {
+        const sig = req.headers['stripe-signature'];
+
+        let event;
+
+        try {
+            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+            console.log('webhook verified');
+
+        } catch (err: any) {
+            console.log(err);
+
+            res.status(400).send(`Webhook Error: ${err.message}`);
+            return;
+        }
+
+        // Handle the event
+        switch (event.type) {
+            case 'payment_intent.succeeded':
+                const paymentIntentSucceeded = event.data.object;
+                // Then define and call a function to handle the event payment_intent.succeeded
+                break;
+            // ... handle other event types
+            default:
+                console.log(`Unhandled event type ${event.type}`);
+        }
+        // Return a 200 response to acknowledge receipt of the event
+        res.send({ message: 'Payment successfull' });
     }
-  };
-  
+    getAllDepartment = async (req:RequestType, res: Response) => {
+        try {
+            const departmentData = await userProvider.getDepartments()
+            if(!departmentData) throw new  NotFoundError('departments not found')
+            res.status(200).send({departments:departmentData})
 
+        } catch (e: any) {
+            console.log("\nLogout All User Route Error:", e.message);
+            const code = !e.code ? 500 : e.code >= 400 && e.code <= 599 ? e.code : 500;
+            res.status(code).send({ message: e.meesage })
+        }
 
+    }
+   
 }
 
 export default UserController;

@@ -5,23 +5,26 @@ import AddFileButton from '../addFile/AddFileButton'
 import AddFolder from '../addFile/AddFolder'
 import TopNavBar from '../topNavBar/TopNavBar'
 import UserHome from '../user/UserHome'
+import { Grid } from '@mui/material'
+import Footer from '../user/footer/Footer'
 
 function home() {
 
   return (
-    <div class="bg-white flex flex-wrap">
-    <div >
-      <SideNavBar />
-    </div>
-    <div class="flex-1">
-      <TopNavBar className="flex-1 fixed" />
-      <UserHome />
-    </div>
-    <div>
-     
-    </div>
-  </div>
-  
+    <Grid container style={{ height: '100vh' }} display={'flex'} >
+      <Grid item style={{ position: 'fixed', height: '100%', }}>
+        <SideNavBar />
+      </Grid>
+      {/* style={{ marginLeft: '340px', padding: '20px' }} */}
+      <Grid item style={{ marginLeft: '340px', padding: '20px', position: 'relative' }} >
+        <TopNavBar />
+        <UserHome />
+        <Footer />
+      </Grid>
+    </Grid>
+
+
+
   )
 }
 

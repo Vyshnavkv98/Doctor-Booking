@@ -56,7 +56,7 @@ function AddDepartment() {
           })
           const departmentDetails={...values,departmentImg:uploadPromise.data?.secure_url}
           console.log(departmentDetails);
-        const res=await axios.post("/admin/add-department",departmentDetails)
+        const res=await axios.post("admin/add-department",departmentDetails)
         console.log(res);
           
         if(res){

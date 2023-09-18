@@ -41,7 +41,12 @@ type doctorCache = {
     registrationYear: string,
     registerNumber: string,
     imgUrl: string,
-    image: string
+    image: string,
+    AddressLine1:string,
+    AddressLine2:string,
+    offline:boolean,
+    chat:boolean,
+    video:boolean
 }
 
 
@@ -213,6 +218,11 @@ class doctorServices {
            return doctor?.AvailableSlots
         }
 
+    }
+    getDepartments = async () => {
+        const departmentDetails = await doctorRepository.getDepartments()
+
+        if (departmentDetails) return departmentDetails
     }
 }
 export default doctorServices;

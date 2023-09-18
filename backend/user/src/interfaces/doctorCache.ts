@@ -9,5 +9,10 @@ export type doctorCache={
     registrationYear: string,
     registerNumber: string,
     imgUrl:string,
-    image:string
+    image:string,
+    AddressLine1:string,
+    AddressLine2:string,
+    chat:boolean,
+    video:boolean,
+    offline:boolean,
   }

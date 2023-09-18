@@ -218,6 +218,19 @@ class doctorController {
             res.status(code).send({ message: e.message });
         }
     }
+    getAllDepartment = async (req:RequestType, res: Response) => {
+        try {
+            const departmentData = await doctorProvider.getDepartments()
+            if(!departmentData) throw new  NotFoundError('departments not found')
+            res.status(200).send({departments:departmentData})
+
+        } catch (e: any) {
+            console.log("\nLogout All User Route Error:", e.message);
+            const code = !e.code ? 500 : e.code >= 400 && e.code <= 599 ? e.code : 500;
+            res.status(code).send({ message: e.meesage })
+        }
+
+    }
 
 
 }

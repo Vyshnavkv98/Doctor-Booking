@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 
 import LogoutModal from '../modal/LogoutModal'
-function SideNavBar() {
+function SideNavBar({handleSidenav}) {
 const navigate=useNavigate()
 
   let Menu=[
@@ -60,11 +60,20 @@ const navigate=useNavigate()
       navigate('/profile')
       
     }
+    if(title==='Video consultation'){
+      console.log(title);
+      navigate('/video-consultation')
+      
+    }
 
    } catch (error) {
     console.log(error);
    }
   }
+
+ const handleSidenavbar=(val)=>{
+  return val
+ }
 
     const[open,setOpen]=useState(true)
     const[subMenuOpen,setSubMenuOpen]=useState(false)
@@ -75,8 +84,8 @@ const navigate=useNavigate()
     <div className='flex h-screen '  >
        
       <div className={`bg-dark-purple h-screen p-5 pt-8 ${open?"w-80 duration-500":"w-22 duration-500"}   relative  h-auto rounded-2xl m-3`}>
-    { open? <BsArrowLeftCircleFill className='text-3xl rounded-full absolute -right-3 text-white border border-dark-purple top-9 cursor-pointer' onClick={()=>setOpen(!open)} />:
-    <BsArrowRightCircleFill className='text-3xl rounded-full absolute -right-3 border text-white border-dark-purple top-9 border-3 cursor-pointer' onClick={()=>setOpen(!open)} />
+    { open? <BsArrowLeftCircleFill className='text-3xl rounded-full absolute -right-3 text-white border border-dark-purple top-9 cursor-pointer' onClick={()=>{setOpen(!open);handleSidenav(!open)}} />:
+    <BsArrowRightCircleFill className='text-3xl rounded-full absolute -right-3 border text-white border-dark-purple top-9 border-3 cursor-pointer' onClick={()=>{setOpen(!open);handleSidenav(!open)}} />
   }
 
 

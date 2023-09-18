@@ -50,7 +50,7 @@ console.log(item);
 
 
   return (
-    <div >
+    <Grid >
       <Container maxWidth="xl">
         <Paper
           sx={{
@@ -105,26 +105,28 @@ console.log(item);
 
           }}
         >
-          <Grid container spacing={3} justifyContent="space-between" mt={3} >
+          <Grid container spacing={2} justifyContent="space-between" mt={2}   >
             {data.map((item) => (
-              <Grid item xs={12} md={2}>
+              <Grid item xs={12} md={2} >
                 <Card sx={{
-                  maxWidth: 290, borderRadius: '10px', cursor: 'pointer', transition: 'transform 0.4s ease',
+                  maxWidth: 320,minHeight:350, borderRadius: '10px', cursor: 'pointer', transition: 'transform 0.4s ease',
                   '&:hover': {
                     transform: 'scale(1.1)',
                     boxShadow: '0 8px 12px rgba(0, 0, 0, 0.15)',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: '#ffff',
                     transition: 'transform 0.5s ease',
                   },
-                }} boxShadow={25} onClick={() => handleClick(item.title)}>
+                }} boxShadow={25} onClick={() => handleClick(item.title)} >
                   <CardMedia
-                    sx={{ height: 130 }}
+                    sx={{ width:'11rem', height:'10rem',textAlign:'center',marginLeft:'1rem' }}
                     backgroundColor='blue'
                     image={item.img}
+                    
+                    
 
                   />
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
+                  <CardContent >
+                    <Typography gutterBottom variant="h5" component="div" sx={{fontWeight:550}}>
                       {item.title}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -141,7 +143,7 @@ console.log(item);
           </Grid>
         </Paper>
       </Container>
-    </div>
+    </Grid>
   )
 }
 

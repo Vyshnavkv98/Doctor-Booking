@@ -1,18 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from '../redux/user'
-import adminReducer from '../redux/admin'
-import doctorReducer from '../redux/doctor'
-import searchReducer from '../redux/searchDoctor'
-import appointmentReducer from '../redux/appointment'
+import persistedReducer from "../persistedReducer/PersistedReducer";
+import { persistStore } from 'redux-persist';
 
 const store=configureStore({
-    reducer:{
-        user: userReducer,
-        admin: adminReducer,
-        doctor:doctorReducer,
-        searchKeyword:searchReducer,
-        appointment:appointmentReducer
-    }
+    reducer:persistedReducer,
 })
+export const persistor = persistStore(store)
 
 export default store
